@@ -17,10 +17,11 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Instalar dependências
+      - name: Instalar dependências com versões fixas
         run: |
           pip install -U pip
-          pip install prefect
+          pip install --no-deps -r requirements.txt
+          pip install prefect==2.16.4 griffe==0.35.2
 
       - name: Autenticar no Prefect Cloud
         env:
