@@ -17,6 +17,10 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Verificar conectividade com Prefect Cloud
+        run: |
+          curl -I https://api.prefect.cloud
+
       - name: Instalar dependências com versões fixas
         run: |
           pip install -U pip
