@@ -1,0 +1,34 @@
+name: Deploy Prefect Flow
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Instalar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependências
+        run: |
+          pip install -U pip
+          pip install prefect
+
+      - name: Autenticar no Prefect Cloud
+        env:
+          PREFECT_API_KEY: ${{ secrets.PREFECT_API_KEY }}
+          PREFECT_API_URL: ${{ secrets.PREFECT_API_URL }}
+        run: |
+          prefect cloud login --key $PREFECT_API_KEY --workspace uff-eletrica/default
+
+      - name: Deploy do Flow
+        run: |
+          prefect deploy -n hello-deploy
