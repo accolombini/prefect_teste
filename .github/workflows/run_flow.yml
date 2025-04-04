@@ -1,0 +1,28 @@
+name: Run Prefect Flow
+
+on:
+  push:
+    paths:
+      - 'flows/**'
+      - '.github/workflows/run_flow.yml'
+  workflow_dispatch:
+
+jobs:
+  run-flow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install prefect==2.16.4
+
+      - name: Run Prefect flow
+        run: python flows/hello_world.py

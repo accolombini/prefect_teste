@@ -1,0 +1,29 @@
+# Welcome to your prefect.yaml file! You can use this file for storing and managing
+# configuration for deploying your flows. We recommend committing this file to source
+# control along with your flow code.
+
+# Generic metadata about this project
+name: prefect_lab
+prefect-version: 2.16.4
+
+pull:
+- prefect.deployments.steps.set_working_directory:
+    directory: /Users/accol/Library/Mobile 
+      Documents/com~apple~CloudDocs/UNIVERSIDADES/UFF/CARREIRA_POS/PPGEET/ORQUESTRACAO/LABORATORIO/prefect_lab
+
+deployments:
+- name: hello-deploy
+  entrypoint: flows/hello_world.py:hello_world
+  parameters: {}
+  work_pool:
+    name: hello-pool
+    work_queue_name: default
+    job_variables: {}
+  schedules:
+  - interval: 60.0
+    anchor_date: '2025-04-04T13:57:48.777327+00:00'
+    timezone: UTC
+    active: true
+  tags: []
+  description: Executa o fluxo hello_world a cada 60s.
+  version:
