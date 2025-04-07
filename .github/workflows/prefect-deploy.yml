@@ -4,12 +4,12 @@
 
 name: Deploy Prefect Flow
 
-on:   # O deploy será acionado automaticamente quando houver push na branch main
+on: # O deploy será acionado automaticamente quando houver push na branch main
   push:
     branches:
       - main
 
-jobs:  # Definindo o job de deploy
+jobs: # Definindo o job de deploy
   # O job será executado em um ambiente Ubuntu local, daí ainda precisamos das etapas 3 e 4
   deploy:
     runs-on: ubuntu-latest
@@ -22,12 +22,30 @@ jobs:  # Definindo o job de deploy
         with:
           python-version: "3.12"
 
-      - name: Instalar dependências
+      - name: Instalar dependências com versões fixas
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -U pip
+          pip install --no-deps -r requirements.txt
+          pip install prefect==2.16.4 griffe==0.35.2
 
-      - name: Deploy do Flow com Prefect
-        run: prefect deploy -n hello-deploy
+      - name: Verificar conexão com Prefect Cloud
+        run: |
+          curl -I https://api.prefect.cloud
+
+      - name: Autenticar no Prefect Cloud
         env:
-          PREFECT_API_URL: http://localhost:4200/api # URL do Prefect Server aqui substituir por http://<SEU_IP_LOCAL>:4200/api
+          PREFECT_API_KEY: ${{ secrets.PREFECT_API_KEY }}
+          PREFECT_API_URL: ${{ secrets.PREFECT_API_URL }}
+        run: |
+          prefect cloud login --key $PREFECT_API_KEY --workspace uff-eletrica/default
+
+      - name: Deploy do Flow com retry
+        run: |
+          for i in {1..5}; do
+            prefect deploy -n hello-deploy && break || sleep 5
+          done
+
+      # - name: Deploy do Flow com Prefect
+      #   run: prefect deploy -n hello-deploy
+      #   env:
+      #     PREFECT_API_URL: http://localhost:4200/api # URL do Prefect Server aqui substituir por http://<SEU_IP_LOCAL>:4200/api
